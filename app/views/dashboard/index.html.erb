@@ -1,0 +1,71 @@
+<div class="max-w-6xl mx-auto p-6">
+
+  <h1 class="text-2xl font-bold mb-6">Welcome, <%= current_user.role.titleize %></h1>
+
+  <% if current_user.super_admin? %>
+    <div class="grid grid-cols-3 gap-6">
+      <div class="bg-blue-100 p-4 rounded">
+        <h2 class="text-lg font-semibold">Total Users</h2>
+        <p class="text-2xl"><%= @users.count %></p>
+      </div>
+      <div class="bg-green-100 p-4 rounded">
+        <h2 class="text-lg font-semibold">Total Clients</h2>
+        <p class="text-2xl"><%= @clients.count %></p>
+      </div>
+      <div class="bg-yellow-100 p-4 rounded">
+        <h2 class="text-lg font-semibold">Total Documents</h2>
+        <p class="text-2xl"><%= @documents.count %></p>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <%= link_to "Manage Users", admin_users_path, class: "text-blue-600 hover:underline" %> |
+      <%= link_to "View Documents", documents_path, class: "text-blue-600 hover:underline" %>
+    </div>
+
+  <% elsif current_user.manager? %>
+    <div class="bg-white shadow p-6 rounded">
+      <h2 class="text-xl font-bold mb-2">All Clients</h2>
+      <ul>
+        <% @clients.each do |client| %>
+          <li><%= client.name %> - <%= client.status %></li>
+        <% end %>
+      </ul>
+    </div>
+
+  <% elsif current_user.supervisor? %>
+    <div class="bg-white shadow p-6 rounded">
+      <h2 class="text-xl font-bold mb-2">Assigned Clients</h2>
+      <ul>
+        <% @clients.each do |client| %>
+          <li><%= client.name %> - <%= client.status %></li>
+        <% end %>
+      </ul>
+    </div>
+
+  <% elsif current_user.data_entry_operator? %>
+    <div class="bg-white shadow p-6 rounded">
+      <h2 class="text-xl font-bold mb-2">Clients to Process</h2>
+      <ul>
+        <% @clients.each do |client| %>
+          <li><%= client.name %></li>
+        <% end %>
+      </ul>
+    </div>
+
+  <% elsif current_user.client? %>
+    <div class="bg-white shadow p-6 rounded">
+      <h2 class="text-xl font-bold mb-2">My Documents</h2>
+      <% if @clients.first.present? %>
+        <% @clients.first.documents.each do |doc| %>
+          <div class="mb-2">
+            <%= doc.title %> — <strong>Category:</strong> <%= doc.category.presence || "Not categorized" %>
+          </div>
+        <% end %>
+      <% else %>
+        <p>No documents uploaded yet.</p>
+      <% end %>
+    </div>
+  <% end %>
+
+</div>
