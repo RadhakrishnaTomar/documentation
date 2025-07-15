@@ -1,6 +1,8 @@
 class DocumentsController < ApplicationController
   before_action :authenticate_user!
   before_action :ensure_client!, only: [:new, :create] 
+  before_action :restrict_manager_access, only: [:index, :show, :edit, :update, ]
+
 
   def index
     @documents = current_user.super_admin? ? Document.all : Document.where(client_id: current_user.client&.id)
@@ -40,6 +42,12 @@ class DocumentsController < ApplicationController
   def ensure_client!
     return if current_user.super_admin? 
     redirect_to root_path, alert: "Access denied." unless current_user.client?
+  end
+
+  def restrict_manager_access
+    if current_user.manager?
+      redirect_to root_path, alert: "Access denied. Managers cannot view documents."
+    end
   end
 
 
