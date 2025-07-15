@@ -2,31 +2,73 @@
 <html>
   <head>
     <title><%= content_for(:title) || "Docflow" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
 
+    <!-- Favicons & Manifest -->
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
+
+    <!-- Tailwind CSS & App Styles -->
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+
+    <!-- JavaScript Importmap -->
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
-      <%= yield %>
+  <body class="bg-gray-50 text-gray-800">
+
+    <!-- ✅ Navbar -->
+    <nav class="bg-white border-b border-gray-200 fixed w-full z-50 top-0 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex space-x-6">
+            <%= link_to "🏠 Dashboard", root_path, class: "text-gray-700 hover:text-blue-600 font-medium" %>
+
+            <% if user_signed_in? && current_user.client? %>
+              <%= link_to "📄 Upload Document", new_document_path, class: "text-gray-700 hover:text-blue-600 font-medium" %>
+            <% elsif user_signed_in? && (current_user.super_admin? || current_user.manager?) %>
+              <%= link_to "📁 Documents", documents_path, class: "text-gray-700 hover:text-blue-600 font-medium" %>
+              <%= link_to "👥 Clients", clients_path, class: "text-gray-700 hover:text-blue-600 font-medium" %>
+            <% end %>
+          </div>
+
+          <% if user_signed_in? %>
+            <div class="text-sm text-gray-700 flex items-center gap-4">
+              <span>👤 <%= current_user.email %></span>
+              <!-- ✅ Logout (method: :delete works with Turbo here) -->
+              <%= link_to 'Logout', destroy_user_session_path, method: :delete, data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to log out?" }, class: "text-red-600 hover:underline" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ✅ Main Content -->
+    <main class="container mx-auto pt-24 px-5 max-w-6xl">
       <% if notice %>
-        <div class="bg-green-100 text-green-700 p-2 mb-4 rounded"><%= notice %></div>
+        <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-2 mb-4 rounded">
+          <%= notice %>
+        </div>
       <% end %>
+
       <% if alert %>
-        <div class="bg-red-100 text-red-700 p-2 mb-4 rounded"><%= alert %></div>
+        <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-2 mb-4 rounded">
+          <%= alert %>
+        </div>
       <% end %>
+
+      <%= yield %>
     </main>
+
+    <!-- ✅ JavaScript for Turbo & Stimulus -->
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
   </body>
 </html>

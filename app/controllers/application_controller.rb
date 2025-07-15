@@ -1,8 +1,9 @@
 class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
   before_action :authenticate_user!
-  def after_sign_in_path_for(resource)
-    dashboard_index_path 
+
+  def authorize_super_admin!
+    unless current_user&.super_admin?
+      redirect_to root_path, alert: "Access denied. Super Admin only."
+    end
   end
 end

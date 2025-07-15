@@ -1,15 +1,14 @@
 Rails.application.routes.draw do
   devise_for :users
 
+  root to: "dashboard#index"
+
   namespace :admin do
-    resources :users, only: [:index, :show, :edit, :update]
+    resources :users, only: [:index, :show, :new, :create, :edit, :update]
   end
 
-  resources :documents
+  resources :documents, only: [:new, :create, :index, :show]
   resources :clients
-
-  get "dashboard/index"
-  root to: 'dashboard#index'
 
   get "up" => "rails/health#show", as: :rails_health_check
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

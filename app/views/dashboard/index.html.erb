@@ -1,71 +1,90 @@
-<div class="max-w-6xl mx-auto p-6">
-
-  <h1 class="text-2xl font-bold mb-6">Welcome, <%= current_user.role.titleize %></h1>
+<div class="max-w-6xl mx-auto p-6 space-y-10">
+  <h1 class="text-3xl font-bold text-gray-800">Welcome, <%= current_user.role.titleize %></h1>
 
   <% if current_user.super_admin? %>
-    <div class="grid grid-cols-3 gap-6">
-      <div class="bg-blue-100 p-4 rounded">
-        <h2 class="text-lg font-semibold">Total Users</h2>
-        <p class="text-2xl"><%= @users.count %></p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div class="bg-blue-100 p-6 rounded-lg shadow">
+        <h2 class="text-lg font-semibold text-blue-800">Total Users</h2>
+        <p class="text-3xl font-bold text-blue-900"><%= @users.count %></p>
       </div>
-      <div class="bg-green-100 p-4 rounded">
-        <h2 class="text-lg font-semibold">Total Clients</h2>
-        <p class="text-2xl"><%= @clients.count %></p>
+
+      <div class="bg-green-100 p-6 rounded-lg shadow">
+        <h2 class="text-lg font-semibold text-green-800">Total Clients</h2>
+        <p class="text-3xl font-bold text-green-900"><%= @clients.count %></p>
       </div>
-      <div class="bg-yellow-100 p-4 rounded">
-        <h2 class="text-lg font-semibold">Total Documents</h2>
-        <p class="text-2xl"><%= @documents.count %></p>
+
+      <div class="bg-yellow-100 p-6 rounded-lg shadow">
+        <h2 class="text-lg font-semibold text-yellow-800">Total Documents</h2>
+        <p class="text-3xl font-bold text-yellow-900"><%= @documents.count %></p>
       </div>
     </div>
 
-    <div class="mt-6">
-      <%= link_to "Manage Users", admin_users_path, class: "text-blue-600 hover:underline" %> |
-      <%= link_to "View Documents", documents_path, class: "text-blue-600 hover:underline" %>
+    <div class="mt-6 space-x-4">
+      <%= link_to "➕ Create New User", new_admin_user_path, class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500" %>
+      <%= link_to "👥 View Users", admin_users_path, class: "text-blue-600 hover:underline font-medium" %>
+      <%= link_to "📁 View Documents", documents_path, class: "text-blue-600 hover:underline font-medium" %>
+      <%= link_to "➕ Create Client", new_client_path, class: "bg-green-600 text-white px-3 py-2 rounded hover:bg-green-500" %>
     </div>
 
   <% elsif current_user.manager? %>
-    <div class="bg-white shadow p-6 rounded">
-      <h2 class="text-xl font-bold mb-2">All Clients</h2>
-      <ul>
+    <div class="bg-white shadow p-6 rounded-lg">
+      <h2 class="text-xl font-bold mb-4 text-gray-800">All Clients</h2>
+      <ul class="space-y-2">
         <% @clients.each do |client| %>
-          <li><%= client.name %> - <%= client.status %></li>
+          <li class="text-gray-700">• <%= client.name %> — Assigned To: <%= client.assigned_to&.email || "Unassigned" %></li>
         <% end %>
       </ul>
+
+      <div class="mt-4">
+        <%= link_to "➕ Manage Clients", clients_path, class: "text-blue-600 underline" %>
+      </div>
     </div>
 
   <% elsif current_user.supervisor? %>
-    <div class="bg-white shadow p-6 rounded">
-      <h2 class="text-xl font-bold mb-2">Assigned Clients</h2>
-      <ul>
+    <div class="bg-white shadow p-6 rounded-lg">
+      <h2 class="text-xl font-bold mb-4 text-gray-800">Assigned Clients</h2>
+      <ul class="space-y-2">
         <% @clients.each do |client| %>
-          <li><%= client.name %> - <%= client.status %></li>
+          <li class="text-gray-700">• <%= client.name %> — Status: <%= client.status %></li>
         <% end %>
       </ul>
     </div>
 
   <% elsif current_user.data_entry_operator? %>
-    <div class="bg-white shadow p-6 rounded">
-      <h2 class="text-xl font-bold mb-2">Clients to Process</h2>
-      <ul>
+    <div class="bg-white shadow p-6 rounded-lg">
+      <h2 class="text-xl font-bold mb-4 text-gray-800">Clients to Process</h2>
+      <ul class="space-y-2">
         <% @clients.each do |client| %>
-          <li><%= client.name %></li>
+          <li class="text-gray-700">• <%= client.name %></li>
         <% end %>
       </ul>
     </div>
 
   <% elsif current_user.client? %>
-    <div class="bg-white shadow p-6 rounded">
-      <h2 class="text-xl font-bold mb-2">My Documents</h2>
-      <% if @clients.first.present? %>
-        <% @clients.first.documents.each do |doc| %>
-          <div class="mb-2">
-            <%= doc.title %> — <strong>Category:</strong> <%= doc.category.presence || "Not categorized" %>
+    <div class="bg-white shadow p-6 rounded-lg">
+      <h2 class="text-xl font-bold mb-4 text-gray-800">My Documents</h2>
+
+      <% client = @clients.first %>
+      <% if client && client.documents.any? %>
+        <% client.documents.each do |doc| %>
+          <div class="mb-4 border-b pb-3">
+            <p class="text-lg font-semibold"><%= doc.title %></p>
+            <p><strong>Category:</strong> <%= doc.category.presence || "Not categorized" %></p>
+            <% if doc.file.attached? %>
+              <%= link_to "⬇️ Download", url_for(doc.file), target: "_blank", class: "text-blue-600 hover:underline" %>
+            <% else %>
+              <p class="text-red-500">No file uploaded.</p>
+            <% end %>
           </div>
         <% end %>
       <% else %>
-        <p>No documents uploaded yet.</p>
+        <p class="text-gray-500">No documents uploaded yet.</p>
       <% end %>
+
+      <div class="mt-4">
+        <%= link_to "📤 Upload New Document", new_document_path, class: "bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded" %>
+      </div>
     </div>
   <% end %>
-
 </div>

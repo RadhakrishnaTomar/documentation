@@ -1,70 +1,31 @@
 class DocumentsController < ApplicationController
-  before_action :set_document, only: %i[ show edit update destroy ]
+  before_action :authenticate_user!
+  before_action :ensure_client!
 
-  # GET /documents or /documents.json
   def index
-    @documents = Document.all
+      @documents = current_user.super_admin? ? Document.all : Document.where(client_id: current_user.client&.id)
   end
 
-  # GET /documents/1 or /documents/1.json
-  def show
-  end
-
-  # GET /documents/new
   def new
     @document = Document.new
   end
 
-  # GET /documents/1/edit
-  def edit
-  end
-
-  # POST /documents or /documents.json
   def create
-    @document = Document.new(document_params)
-
-    respond_to do |format|
-      if @document.save
-        format.html { redirect_to @document, notice: "Document was successfully created." }
-        format.json { render :show, status: :created, location: @document }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @document.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # PATCH/PUT /documents/1 or /documents/1.json
-  def update
-    respond_to do |format|
-      if @document.update(document_params)
-        format.html { redirect_to @document, notice: "Document was successfully updated." }
-        format.json { render :show, status: :ok, location: @document }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @document.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # DELETE /documents/1 or /documents/1.json
-  def destroy
-    @document.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to documents_path, status: :see_other, notice: "Document was successfully destroyed." }
-      format.json { head :no_content }
+    @document = current_user.client.documents.build(document_params)
+    if @document.save
+      redirect_to documents_path, notice: "Document uploaded successfully."
+    else
+      render :new
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_document
-      @document = Document.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def document_params
-      params.require(:document).permit(:title, :category, :client_id, :file)
-    end
+  def ensure_client!
+    redirect_to root_path, alert: "Access denied." unless current_user.client?
+  end
+
+  def document_params
+    params.require(:document).permit(:title, :category, :file)
+  end
 end
