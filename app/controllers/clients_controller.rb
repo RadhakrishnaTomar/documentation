@@ -17,6 +17,18 @@ class ClientsController < ApplicationController
     end
   end
 
+  def assign_supervisor
+    @client = Client.find(params[:id])
+    authorize! :assign_supervisor, @client
+
+    if @client.update(assigned_to_id: params[:client][:assigned_to_id])
+      redirect_to clients_path, notice: "Supervisor assigned successfully."
+    else
+      redirect_to clients_path, alert: "Failed to assign supervisor."
+    end
+  end
+
+
   private
 
   def client_params

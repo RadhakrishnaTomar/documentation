@@ -8,7 +8,11 @@ Rails.application.routes.draw do
   end
 
   resources :documents
-  resources :clients
+  resources :clients do
+    member do
+      patch :assign_supervisor
+    end
+  end
 
   get "up" => "rails/health#show", as: :rails_health_check
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

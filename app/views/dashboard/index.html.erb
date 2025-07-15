@@ -2,7 +2,7 @@
   <h1 class="text-3xl font-bold text-gray-800">Welcome, <%= current_user.role.titleize %></h1>
 
   <% if current_user.super_admin? %>
-     
+    <!-- Super Admin -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
       <div class="bg-blue-100 p-6 rounded-lg shadow">
         <h2 class="text-lg font-semibold text-blue-800">Total Users</h2>
@@ -24,11 +24,11 @@
       <%= link_to "➕ Create New User", new_admin_user_path, class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500" %>
       <%= link_to "👥 View Users", admin_users_path, class: "text-blue-600 hover:underline font-medium" %>
       <%= link_to "📁 View Documents", documents_path, class: "text-blue-600 hover:underline font-medium" %>
-
       <%= link_to "➕ Create Client", new_client_path, class: "bg-green-600 text-white px-3 py-2 rounded hover:bg-green-500" %>
     </div>
 
   <% elsif current_user.manager? %>
+    <!-- Manager -->
     <div class="bg-white shadow p-6 rounded-lg">
       <h2 class="text-xl font-bold mb-4 text-gray-800">All Clients</h2>
       <ul class="space-y-2">
@@ -42,17 +42,27 @@
       </div>
     </div>
 
-  <% elsif current_user.supervisor? %>
-    <div class="bg-white shadow p-6 rounded-lg">
-      <h2 class="text-xl font-bold mb-4 text-gray-800">Assigned Clients</h2>
-      <ul class="space-y-2">
-        <% @clients.each do |client| %>
-          <li class="text-gray-700">• <%= client.name %> — Status: <%= client.status %></li>
-        <% end %>
-      </ul>
+    <div class="bg-white shadow p-6 rounded-lg mt-6">
+      <h2 class="text-xl font-bold mb-4 text-gray-800">Assign Supervisors to Clients</h2>
+
+      <% @clients.each do |client| %>
+        <div class="mb-6 border p-4 rounded">
+          <p class="text-lg font-semibold"><%= client.name %></p>
+          <p class="text-gray-600 mb-2">Assigned To: <%= client.assigned_to&.email || "Unassigned" %></p>
+
+          <%= form_with model: client, url: assign_supervisor_client_path(client), method: :patch, local: true do |f| %>
+            <div class="flex items-center gap-4">
+              <%= f.label :assigned_to_id, "Assign Supervisor", class: "font-medium" %>
+              <%= f.collection_select :assigned_to_id, User.where(role: :supervisor), :id, :email, { prompt: "Select Supervisor" }, class: "border rounded px-2 py-1" %>
+              <%= f.submit "Assign", class: "bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-500" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
     </div>
 
   <% elsif current_user.data_entry_operator? %>
+    <!-- Data Entry Operator -->
     <div class="bg-white shadow p-6 rounded-lg">
       <h2 class="text-xl font-bold mb-4 text-gray-800">Clients to Process</h2>
       <ul class="space-y-2">
@@ -63,6 +73,7 @@
     </div>
 
   <% elsif current_user.client? %>
+    <!-- Client -->
     <div class="bg-white shadow p-6 rounded-lg">
       <h2 class="text-xl font-bold mb-4 text-gray-800">My Documents</h2>
 
