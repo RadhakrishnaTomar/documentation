@@ -3,7 +3,6 @@ class Ability
 
   def initialize(user)
     return unless user  
-    
     case user.role.to_sym
     when :super_admin
       can :manage, :all

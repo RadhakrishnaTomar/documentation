@@ -7,7 +7,7 @@ Rails.application.routes.draw do
     resources :users, only: [:index, :show, :new, :create, :edit, :update]
   end
 
-  resources :documents, only: [:new, :create, :index, :show]
+  resources :documents
   resources :clients
 
   get "up" => "rails/health#show", as: :rails_health_check
