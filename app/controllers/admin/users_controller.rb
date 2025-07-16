@@ -28,9 +28,6 @@ class Admin::UsersController < ApplicationController
     end
   end
 
-
-
-
   def edit
     @user = User.find(params[:id])
   end
@@ -41,6 +38,16 @@ class Admin::UsersController < ApplicationController
       redirect_to admin_user_path(@user), notice: "User updated successfully."
     else
       render :edit
+    end
+  end
+
+  def destroy
+    @user = User.find(params[:id])
+    if @user
+      @user.destroy
+      redirect_to users_path, notice: "Client was successfully deleted."
+    else
+      redirect_to users_path, alert: "Client not found."
     end
   end
 

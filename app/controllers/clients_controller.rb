@@ -54,9 +54,9 @@ class ClientsController < ApplicationController
     authorize! :assign_supervisor, @client
 
     if @client.update(assigned_to_id: params[:client][:assigned_to_id])
-      redirect_to clients_path, notice: "Supervisor assigned successfully."
+      redirect_to dashboard_path, notice: "Supervisor assigned successfully."
     else
-      redirect_to clients_path, alert: "Failed to assign supervisor."
+      redirect_to dashboard_path, alert: "Failed to assign supervisor."
     end
   end
 

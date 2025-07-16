@@ -16,8 +16,9 @@
         <td class="px-4 py-2"><%= user.email %></td>
         <td class="px-4 py-2"><%= user.role.titleize %></td>
         <td class="px-4 py-2">
+          <%= link_to 'Show', admin_user_path(user), class: "text-green-600 hover:underline" %>
           <%= link_to 'Edit', edit_admin_user_path(user), class: "text-blue-600 hover:underline" %>
-          <%= link_to 'Delete', admin_user_path(user), method: :delete, data: { confirm: "Are you sure?" }, class: "ml-2 text-red-600 hover:underline" %>
+          <%= button_to "Destroy", admin_user_path(user), method: :delete, class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
         </td>
       </tr>
     <% end %>

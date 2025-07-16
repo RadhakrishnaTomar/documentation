@@ -19,13 +19,23 @@ class DocumentsController < ApplicationController
   end
 
   def create
-    @document = current_user.client.documents.build(document_params)
-    if @document.save
-      redirect_to documents_path, notice: "Document uploaded successfully."
+    if current_user.client?
+      client = Client.find_by(user_id: current_user.id)
+      unless client
+        redirect_to root_path, alert: "Client not found." and return
+      end
+      @document = client.documents.build(document_params)
+      if @document.save
+        redirect_to documents_path, notice: "Document uploaded successfully."
+      else
+        render :new, status: :unprocessable_entity
+      end
     else
-      render :new
+      # Handle for other roles if needed
+      redirect_to root_path, alert: "You are not authorized to upload documents."
     end
   end
+
   
   def edit
     @document = Document.find(params[:id])

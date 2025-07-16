@@ -47,6 +47,7 @@
       <% @clients.each do |client| %>
         <div class="mb-6 border p-4 rounded">
           <p class="text-lg font-semibold"><%= client.name %></p>
+          <p class="text-lg font-semibold"><%= client.email %></p>
           <p class="text-gray-600 mb-2">Assigned To: <%= client.assigned_to&.email || "Unassigned" %></p>
 
           <%= form_with model: client, url: assign_supervisor_client_path(client), method: :patch, local: true do |f| %>
@@ -69,11 +70,10 @@
         <div class="border-b pb-4 mb-4">
           <p class="font-semibold"><%= client.name %></p>
           <p class="text-gray-600">Status: <%= client.status.presence || "N/A" %></p>
-
           <%= form_with model: client, url: assign_data_entry_operator_client_path(client), method: :patch, local: true do |f| %>
             <div class="mt-2 flex items-center gap-2">
-              <%= f.label :assigned_to_id, "Assign Data Entry Operator", class: "font-medium" %>
-              <%= f.collection_select :assigned_to_id, User.where(role: :data_entry_operator), :id, :email, { prompt: "Select Operator" }, class: "border px-2 py-1 rounded" %>
+              <%= f.label :data_entry_operator_id, "Assign Data Entry Operator", class: "font-medium" %>
+              <%= f.collection_select :data_entry_operator_id, User.where(role: :data_entry_operator), :id, :email, { prompt: "Select Operator" }, class: "border px-2 py-1 rounded" %>
               <%= f.submit "Assign", class: "bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-500" %>
             </div>
           <% end %>
