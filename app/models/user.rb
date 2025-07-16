@@ -1,7 +1,9 @@
 class User < ApplicationRecord
   has_one :client, dependent: :destroy
+  has_many :assigned_clients, class_name: "Client", foreign_key: :data_entry_operator_id
 
-  enum role: {
+
+  enum :role, {
     super_admin: 0,
     manager: 1,
     supervisor: 2,

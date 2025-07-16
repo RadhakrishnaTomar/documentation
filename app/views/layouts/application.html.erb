@@ -50,11 +50,9 @@
 
     <!-- ✅ Main Content -->
     <main class="container mx-auto pt-24 px-5 max-w-6xl">
-      <% if flash[:notice] %>
-        <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-2 mb-4 rounded">
-          <%= flash[:notice] %>
-        </div>
-      <% end %>
+     <% if flash[:notice] %>
+       <div class="..."><%= flash[:notice] %></div>
+     <% end %>
 
       <% if alert %>
         <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-2 mb-4 rounded">

@@ -30,7 +30,7 @@
   <div>
     <%= form.label :role, class: "block text-gray-700 font-semibold mb-1" %>
     <%= form.select :role,
-        User.roles.slice("manager", "supervisor", "data_entry_operator").map { |r, _| [r.titleize, r] },
+        User.roles.slice("manager", "supervisor", "data_entry_operator","client").map { |r, _| [r.titleize, r] },
         { prompt: "Select Role" },
         class: "w-full p-2 border rounded" %>
   </div>

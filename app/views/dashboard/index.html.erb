@@ -23,10 +23,7 @@
     <div class="mt-6 space-x-4">
       <%= link_to "➕ Create New User", new_admin_user_path, class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500" %>
       <%= link_to "👥 View Users", admin_users_path, class: "text-blue-600 hover:underline font-medium" %>
-      <% unless current_user.manager? %>
-        <%= link_to "📁 View Documents", documents_path, class: "text-blue-600 hover:underline font-medium" %>
-      <% end %>
-      <%= link_to "➕ Create Client", new_client_path, class: "bg-green-600 text-white px-3 py-2 rounded hover:bg-green-500" %>
+      <%= link_to "📁 View Documents", documents_path, class: "text-blue-600 hover:underline font-medium" %>
     </div>
 
   <% elsif current_user.manager? %>
@@ -63,15 +60,75 @@
       <% end %>
     </div>
 
+  <% elsif current_user.supervisor? %>
+    <!-- Supervisor -->
+    <div class="bg-white shadow p-6 rounded-lg">
+      <h2 class="text-xl font-bold mb-4 text-gray-800">Clients Assigned to You</h2>
+
+      <% @clients.each do |client| %>
+        <div class="border-b pb-4 mb-4">
+          <p class="font-semibold"><%= client.name %></p>
+          <p class="text-gray-600">Status: <%= client.status.presence || "N/A" %></p>
+
+          <%= form_with model: client, url: assign_data_entry_operator_client_path(client), method: :patch, local: true do |f| %>
+            <div class="mt-2 flex items-center gap-2">
+              <%= f.label :assigned_to_id, "Assign Data Entry Operator", class: "font-medium" %>
+              <%= f.collection_select :assigned_to_id, User.where(role: :data_entry_operator), :id, :email, { prompt: "Select Operator" }, class: "border px-2 py-1 rounded" %>
+              <%= f.submit "Assign", class: "bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-500" %>
+            </div>
+          <% end %>
+
+          <% if client.documents.any? %>
+            <div class="mt-2 ml-4">
+              <% client.documents.each do |doc| %>
+                <div class="mb-2">
+                  <p><strong>Title:</strong> <%= doc.title %> | <strong>Category:</strong> <%= doc.category.presence || "Uncategorized" %></p>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
   <% elsif current_user.data_entry_operator? %>
     <!-- Data Entry Operator -->
     <div class="bg-white shadow p-6 rounded-lg">
-      <h2 class="text-xl font-bold mb-4 text-gray-800">Clients to Process</h2>
-      <ul class="space-y-2">
-        <% @clients.each do |client| %>
-          <li class="text-gray-700">• <%= client.name %></li>
-        <% end %>
-      </ul>
+      <h2 class="text-xl font-bold mb-4 text-gray-800">Clients Assigned to You</h2>
+
+      <% @clients.each do |client| %>
+        <div class="border-b pb-4 mb-4">
+          <p class="font-semibold"><%= client.name %></p>
+          <p class="text-gray-600">Status: <%= client.status.presence || "N/A" %></p>
+
+          <% if client.documents.any? %>
+            <div class="mt-2 ml-4">
+              <% client.documents.each do |doc| %>
+                <div class="mb-2 border p-3 rounded bg-gray-50">
+                  <p><strong>Title:</strong> <%= doc.title %></p>
+                  <p><strong>Category:</strong> <%= doc.category.presence || "Uncategorized" %></p>
+
+                  <% if doc.file.attached? %>
+                    <%= link_to "⬇️ Download", url_for(doc.file), target: "_blank", class: "text-blue-600 underline" %>
+                  <% else %>
+                    <p class="text-red-500">No file attached</p>
+                  <% end %>
+
+                  <%= form_with(model: doc, url: update_category_document_path(doc), method: :patch, local: true) do |f| %>
+                    <div class="mt-2 flex items-center gap-2">
+                      <%= f.label :category, "Assign Category", class: "font-medium" %>
+                      <%= f.text_field :category, class: "border px-2 py-1 rounded" %>
+                      <%= f.submit "Update", class: "bg-green-600 text-white px-3 py-1 rounded hover:bg-green-500" %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-gray-500 ml-4">No documents uploaded yet.</p>
+          <% end %>
+        </div>
+      <% end %>
     </div>
 
   <% elsif current_user.client? %>

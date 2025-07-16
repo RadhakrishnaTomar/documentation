@@ -1,7 +1,9 @@
 class DocumentsController < ApplicationController
   before_action :authenticate_user!
   before_action :ensure_client!, only: [:new, :create] 
-  before_action :restrict_manager_access, only: [:index, :show, :edit, :update, ]
+  before_action :restrict_manager_access, only: [:index, :show, :edit, :update]
+  before_action :restrict_supervisor_from_editing_documents, only: [:new, :create, :edit, :update]
+
 
 
   def index
@@ -37,6 +39,16 @@ class DocumentsController < ApplicationController
      render :edit
    end
  end
+
+ def update_category
+   @document = Document.find(params[:id])
+   if @document.update(category: params[:document][:category])
+     redirect_to dashboard_path, notice: "Category updated successfully."
+   else
+     redirect_to dashboard_path, alert: "Failed to update category."
+   end
+ end
+
   private
 
   def ensure_client!
@@ -47,6 +59,12 @@ class DocumentsController < ApplicationController
   def restrict_manager_access
     if current_user.manager?
       redirect_to root_path, alert: "Access denied. Managers cannot view documents."
+    end
+  end
+
+  def restrict_supervisor_from_editing_documents
+    if current_user.supervisor?
+      redirect_to dashboard_path, alert: "You are not authorized to modify documents."
     end
   end
 

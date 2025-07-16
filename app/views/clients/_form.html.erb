@@ -1,37 +1,35 @@
-<%= form_with(model: client, class: "contents") do |form| %>
-  <% if client.errors.any? %>
+<%= form_with(model: @client, class: "contents") do |form| %>
+  <% if @client.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(client.errors.count, "error") %> prohibited this client from being saved:</h2>
-
+      <h2><%= pluralize(@client.errors.count, "error") %> prohibited this client from being saved:</h2>
       <ul class="list-disc ml-6">
-        <% client.errors.each do |error| %>
+        <% @client.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
-
   <div class="my-5">
     <%= form.label :name %>
-    <%= form.text_field :name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": client.errors[:name].none?, "border-red-400 focus:outline-red-600": client.errors[:name].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :email %>
-    <%= form.text_field :email, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": client.errors[:email].none?, "border-red-400 focus:outline-red-600": client.errors[:email].any?}] %>
+    <%= form.text_field :name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": @client.errors[:name].none?, "border-red-400 focus:outline-red-600": @client.errors[:name].any?}] %>
   </div>
 
   <div class="my-5">
     <%= form.label :status %>
-    <%= form.text_field :status, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": client.errors[:status].none?, "border-red-400 focus:outline-red-600": client.errors[:status].any?}] %>
+    <%= form.text_field :status, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": @client.errors[:status].none?, "border-red-400 focus:outline-red-600": @client.errors[:status].any?}] %>
   </div>
 
   <div class="my-5">
-    <%= form.label :assigned_to_id %>
-    <%= form.number_field :assigned_to_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": client.errors[:assigned_to_id].none?, "border-red-400 focus:outline-red-600": client.errors[:assigned_to_id].any?}] %>
+    <%= form.label :assigned_to_id, "Assign to Supervisor" %>
+    <%= form.collection_select :assigned_to_id, User.where(role: :supervisor), :id, :email, { prompt: "Select Supervisor" },
+      class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {
+        "border-gray-400 focus:outline-blue-600": @client.errors[:assigned_to_id].none?,
+        "border-red-400 focus:outline-red-600": @client.errors[:assigned_to_id].any?
+      }] %>
   </div>
 
+
   <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+    <%= form.submit "Create Client", class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
   </div>
 <% end %>

@@ -11,9 +11,12 @@ class DashboardController < ApplicationController
     when "manager"
       @clients = Client.all
 
-    when "supervisor", "data_entry_operator"
+    when "supervisor"
       @clients = Client.where(assigned_to_id: current_user.id)
 
+    when "data_entry_operator"
+      @clients = Client.where(data_entry_operator_id: current_user.id)  
+      
     when "client"
       @clients = Client.where(user_id: current_user.id)
     end

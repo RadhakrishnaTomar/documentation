@@ -2,15 +2,22 @@ Rails.application.routes.draw do
   devise_for :users
 
   root to: "dashboard#index"
+  get "/dashboard", to: "dashboard#index", as: :dashboard
 
   namespace :admin do
     resources :users, only: [:index, :show, :new, :create, :edit, :update]
   end
 
-  resources :documents
+  resources :documents do
+    member do
+      patch :update_category
+    end
+  end
+
   resources :clients do
     member do
       patch :assign_supervisor
+      patch :assign_data_entry_operator
     end
   end
 
