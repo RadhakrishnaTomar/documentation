@@ -14,19 +14,28 @@ class Admin::UsersController < ApplicationController
     @user = User.new
   end
 
-  def create
-    @user = User.new(user_params)
+ def create
+   password = Devise.friendly_token.first(8)
+   @user = User.new(user_params)
+   @user.password = password
+   @user.password_confirmation = password
 
-    if @user.save
-      if @user.client?
-        redirect_to new_client_path(user_id: @user.id), notice: 'Please add client details.'
-      else
-        redirect_to admin_users_path, notice: 'User was successfully created.'
-      end
-    else
-      render :new, status: :unprocessable_entity
-    end
-  end
+   if @user.save
+     UserMailer.send_credentials(@user, password).deliver_later unless @user.client?
+
+     if @user.client?
+      UserMailer.send_credentials(@user, password).deliver_later
+       flash[:notice] = "User created and credentials sent to email. Please complete client details."
+       redirect_to new_client_path(user_id: @user.id)
+     else
+       flash[:notice] = "User created and credentials sent to email."
+       redirect_to admin_users_path
+     end
+   else
+     render :new, status: :unprocessable_entity
+   end
+ end
+
 
   def edit
     @user = User.find(params[:id])
