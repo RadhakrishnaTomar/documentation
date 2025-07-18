@@ -21,9 +21,9 @@
     </div>
 
     <div class="mt-6 space-x-4">
-      <%= link_to "➕ Create New User", new_admin_user_path, class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500" %>
-      <%= link_to "👥 View Users", admin_users_path, class: "text-blue-600 hover:underline font-medium" %>
-      <%= link_to "📁 View Documents", documents_path, class: "text-blue-600 hover:underline font-medium" %>
+      <%= link_to "Create New User", new_admin_user_path, class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500" %>
+      <%= link_to "View Users", admin_users_path, class: "text-blue-600 hover:underline font-medium" %>
+      <%= link_to "View Documents", documents_path, class: "text-blue-600 hover:underline font-medium" %>
     </div>
 
   <% elsif current_user.manager? %>
